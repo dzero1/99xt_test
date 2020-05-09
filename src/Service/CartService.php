@@ -164,7 +164,7 @@ class CartService
             $hasTenBooksInEachCategory = false;
             $total = $children_books_total + $other_books_total;
             $discount = $total * ($coupon->getDiscount()/100);
-            $total = $total - $discount;
+            $total -= $discount;
         } else {
 
             // 10% discount if more than 5 children books
@@ -176,8 +176,10 @@ class CartService
 
             // 5% discount if more than 10 books from any one category
             if ($hasTenBooksInEachCategory){
-                $discount += $total * 0.05;
-                $total = $total - $discount;
+                $_discount = $total * 0.05;
+                $total -= $_discount;
+
+                $discount += $_discount;
             }
 
             $discount = $discount + $children_books_discount;
