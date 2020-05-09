@@ -2,6 +2,25 @@
 #    path: /
 #    controller: App\Controller\DefaultController::index
 
+# Cart routers
+cart_ajax_add:
+    path: /cart/add
+    controller: App\Controller\CartController::addToCart
+    methods:  [POST]
+
+cart_ajax_remove:
+    path: /cart/remove
+    controller: App\Controller\CartController::removeFromCart
+    methods:  [POST]
+
+checkout:
+    path: /checkout
+    controller: App\Controller\CheckoutController::index
+
 index:
     path: /
+    controller: App\Controller\DefaultController::index
+
+index_category:
+    path: /{category}
     controller: App\Controller\DefaultController::index

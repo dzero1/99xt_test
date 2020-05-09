@@ -1,11 +1,72 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
-    </head>
-    <body>
-        <h1>Your lucky number is {{ number }}</h1>
+{% include('header.html.twig') %}
+
+        <main role="main">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <ul class="list-group">
+                            <a href="all" class="list-group-item list-group-item-action {% if category == null or category == 'all' %} active {% endif %}">All Books</a>
+                            {% for cat in categories %}
+                                <a href="{{ cat.id }}" class="list-group-item list-group-item-action {% if category == cat.id %} active {% endif %} ">{{ cat.name }}</a>
+                            {% else %}
+                                No categories have been found.
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="col-sm-7">
+                        {% for book in books %}
+                            {% include 'book.html.twig' %}
+                        {% else %}
+                            No categories have been found.
+                        {% endfor %}
+                    </div>
+
+                    <div class="col-sm-2">
+                    </div>
+
+                </div>
+            </div>
+        </main>
+
+        <div id="floating-cart">
+            {% include 'popcart.html.twig' %}
+        </div>
+
+        <script type="application/javascript">
+            $(document).ready(function(){
+                $(".btn-add-to-cart").click(function(){
+                    $.ajax({
+                        type: "POST",
+                        url: "{{ path('cart_ajax_add') }}",
+                        data: { id: $(this).data('id') }
+                    })
+                    .done(function(response) {
+                        render_popup_cart(response)
+                    });
+                });
+
+                function remove_book(id){
+                    $.ajax({
+                        type: "POST",
+                        url: "{{ path('cart_ajax_remove') }}",
+                        data: { id: id }
+                    })
+                    .done(function(response) {
+                        render_popup_cart(response)
+                    });
+                }
+
+                function render_popup_cart(response = null){
+                    console.log(response);
+                    if (response !== null) $("#floating-cart").html(response.template);
+                    $(".btn-remove-book").off('click')
+                    $(".btn-remove-book").on('click', function(){
+                        remove_book($(this).data('id'))
+                    });
+                }
+                render_popup_cart();
+            });
+        </script>
+        
     </body>
 </html>

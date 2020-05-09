@@ -1,0 +1,9 @@
+a.btn-add-to-cart{
+    color: #fff !important;
+}
+
+#floating-cart{
+    position: fixed;
+    right: 1em;
+    top: 4em;
+}

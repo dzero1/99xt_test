@@ -1,0 +1,88 @@
+{% include('header.html.twig') %}
+
+        <main role="main">
+            <div class="container-fluid">
+                <div class="row justify-content-md-center">
+                    <div class="col-sm-8 ">
+                        <p class="card-text">All the books you purchased are listed here.</p>
+
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                <th scope="col">#</th>
+                                <th scope="col-4">Book Name</th>
+                                <th scope="col">Unit price</th>
+                                <th scope="col">count</th>
+                                <th scope="col">Total</th>
+                                <th scope="col-1">action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for book in cart_books %}
+                                    <tr>
+                                        <th scope="row">{{ loop.index }}</th>
+                                        <td>{{ book.name }}</td>
+                                        <td>{{ book.price | format_currency('LKR') }}</td>
+                                        <td>{{ book.count }}</td>
+                                        <td>{{ (book.price * book.count) | format_currency('LKR') }}</td>
+                                        <td>
+                                            <span class="badge badge-danger badge-pill btn-remove-book" data-id="{{ book.id }}" style="cursor: pointer;">-</span>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4">No book selected.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        <form method="POST">
+                            <div class="input-group mb-3 text-right align-self-end">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-default">Have a coupon code?</span>
+                                </div>
+                                <input type="text" class="form-control col-3" value="{{ code }}" name="code" id="code"
+                                    placeholder="Type coupon code here" aria-label="Cupon code" aria-describedby="inputGroup-sizing-default">
+                                <div class="input-group-append">
+                                    <button type="submit" id="submit" name="submit" class="btn btn-dark btn-coupon-submit">Submit</button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <h5 class="text-right">Total Price: {{ total['total'] | format_currency('LKR') }}/=</h5>
+
+                        {% if total['discount'] > 0 %}
+                        <h6 class="text-right">Total discount: {{ total['discount'] | format_currency('LKR') }}/=</h6>
+                        {% endif %}
+                    </div>
+                </div>
+                <br>
+                <div class="row justify-content-md-center">
+                    <button type="button" class="btn btn-success col-3">Pay now</button>
+                </div>
+            </div>
+        </main>
+
+
+        <script type="application/javascript">
+            $(document).ready(function(){
+                function remove_book(id){
+                    $.ajax({
+                        type: "POST",
+                        url: "{{ path('cart_ajax_remove') }}",
+                        data: { id: id }
+                    })
+                    .done(function(response) {
+                        location.reload();
+                    });
+                }
+
+                $(".btn-remove-book").on('click', function(){
+                    remove_book($(this).data('id'))
+                });
+            });
+        </script>
+        
+    </body>
+</html>

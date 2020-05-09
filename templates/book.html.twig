@@ -1,0 +1,14 @@
+<div class="card" style="width:30%; display: inline-flex; margin-bottom: 10px;">
+    <div style="height:200px; width:100%; background-image: url({{ book.cover }}); background-position: center; background-size: cover; background-repeat: no-repeat;"></div>
+    <div class="card-body">
+        <h5 class="card-title">{{ book.name }}</h5>
+        <p class="card-text">{{ book.description | raw }}</p>
+        <p> 
+            {% for cat in book.category %}
+                <span class="badge badge-info">{{ cat.name }}</span>
+            {% endfor %}
+        </p>
+        <h6>Price: {{ book.price | format_currency('LKR') }}/=</h6>
+        <a class="btn btn-primary btn-add-to-cart" data-id="{{ book.id }}">Add to Cart</a>
+    </div>
+</div>

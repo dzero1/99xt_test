@@ -18,12 +18,17 @@ class XtCoupon
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=20)
      */
     private $code;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true, options={"default": "CURRENT_TIMESTAMP"})
+     * @ORM\Column(type="integer")
+     */
+    private $discount;
+
+    /**
+     * @ORM\Column(type="datetime")
      */
     private $created_at;
 
@@ -40,6 +45,18 @@ class XtCoupon
     public function setCode(string $code): self
     {
         $this->code = $code;
+
+        return $this;
+    }
+
+    public function getDiscount(): ?int
+    {
+        return $this->discount;
+    }
+
+    public function setDiscount(int $discount): self
+    {
+        $this->discount = $discount;
 
         return $this;
     }

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\XtBookRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -23,9 +25,9 @@ class XtBook
     private $name;
 
     /**
-     * @ORM\Column(type="decimal", precision=10, scale=0, options={"default": "0.00"})
+     * @ORM\Column(type="text", nullable=true)
      */
-    private $price;
+    private $description;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -33,14 +35,42 @@ class XtBook
     private $cover;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
+     * @ORM\Column(type="decimal", precision=10, scale=0)
      */
-    private $description;
+    private $price;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true, options={"default": "CURRENT_TIMESTAMP"})
+     * @ORM\Column(type="datetime")
      */
     private $created_at;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=XtCategory::class, inversedBy="xtBooks")
+     */
+    private $category;
+
+    /* Support variables */
+
+    private $count;
+
+    public function getCount(): ?int
+    {
+        return $this->count;
+    }
+
+    public function setCount(int $count): self
+    {
+        $this->count = $count;
+
+        return $this;
+    }
+
+    /* End of support variables */
+
+    public function __construct()
+    {
+        $this->category = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -59,14 +89,14 @@ class XtBook
         return $this;
     }
 
-    public function getPrice(): ?string
+    public function getDescription(): ?string
     {
-        return $this->price;
+        return $this->description;
     }
 
-    public function setPrice(string $price): self
+    public function setDescription(?string $description): self
     {
-        $this->price = $price;
+        $this->description = $description;
 
         return $this;
     }
@@ -83,14 +113,14 @@ class XtBook
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getPrice(): ?string
     {
-        return $this->description;
+        return $this->price;
     }
 
-    public function setDescription(?string $description): self
+    public function setPrice(string $price): self
     {
-        $this->description = $description;
+        $this->price = $price;
 
         return $this;
     }
@@ -103,6 +133,32 @@ class XtBook
     public function setCreatedAt(\DateTimeInterface $created_at): self
     {
         $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|XtCategory[]
+     */
+    public function getCategory(): Collection
+    {
+        return $this->category;
+    }
+
+    public function addCategory(XtCategory $category): self
+    {
+        if (!$this->category->contains($category)) {
+            $this->category[] = $category;
+        }
+
+        return $this;
+    }
+
+    public function removeCategory(XtCategory $category): self
+    {
+        if ($this->category->contains($category)) {
+            $this->category->removeElement($category);
+        }
 
         return $this;
     }

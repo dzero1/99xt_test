@@ -11,7 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 use App\Entity\XtBook;
 use App\Entity\XtCategory;
-use App\Entity\XtBookCategory;
+use App\Entity\XtCoupon;
 
 class DefaultDataCommand extends Command
 {
@@ -34,6 +34,8 @@ class DefaultDataCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
 
+        $doctrine = $this->container->get('doctrine');
+
         $rowId = -1;
         if (($fp = fopen("books.csv", "r")) !== FALSE) {
             while (($row = fgetcsv($fp)) !== FALSE) {
@@ -43,38 +45,52 @@ class DefaultDataCommand extends Command
 
                 echo "Inserting Book => $rowId - $row[0]\n";
 
-                // Create a book
-                $book = new XtBook();
-                $book->setName($row[0]);
-                $book->setPrice(floatval($row[1]));
-                $book->setCover("$rowId.jpg");
-                $book->setCreatedAt(new \DateTime());
-                $book->setDescription("Author: $row[3]<br>Genre: $row[4]<br>Publisher: $row[5]<br>");
-                $this->entityManager->persist($book);
-                echo $this->entityManager->flush();
-
                 // Create a category if not exist
-                $repository = $this->container->get('doctrine')->getRepository(XtCategory::class);
+                $repository = $doctrine->getRepository(XtCategory::class);
                 $cat = $repository->findOneBy(['name' => $row[2]]);
                 if (!$cat){
                     $cat = new XtCategory();
                     $cat->setName($row[2]);
                     $cat->setCreatedAt(new \DateTime());
-                    echo $this->entityManager->persist($cat);
-                    echo $this->entityManager->flush();
+                    $this->entityManager->persist($cat);
+                    $this->entityManager->flush();
                 }
 
-                // Set book category
-                $book_cat = new XtBookCategory();
-                $book_cat->setBook($book->getId());
-                $book_cat->setCategory($cat->getId());
-                echo $this->entityManager->persist($book_cat);
-                echo $this->entityManager->flush();
-
+                // Create a book
+                $book = new XtBook();
+                $book->setName($row[0]);
+                $book->setPrice(floatval($row[1]));
+                $book->setCover("covers/cover$rowId.jpg");
+                $book->setCreatedAt(new \DateTime());
+                $book->setDescription("Author: $row[3]<br>Genre: $row[4]<br>Publisher: $row[5]<br>");
+                $book->addCategory($cat);
+                $this->entityManager->persist($book);
             }
             fclose($fp);
         }
+
+        for ($i=0; $i < 5; $i++) { 
+            $code = $this->generateRandomString();
+            echo "Coupon codes => $code\n";
+
+            $coupon = new XtCoupon();
+            $coupon->setCode($code);
+            $coupon->setDiscount(15);
+            $coupon->setCreatedAt(new \DateTime());
+            $this->entityManager->persist($coupon);
+        }
         
+        $this->entityManager->flush();
         return 0;
+    }
+
+    private function generateRandomString($length = 5) {
+        $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
     }
 }

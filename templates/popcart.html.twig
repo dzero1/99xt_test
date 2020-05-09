@@ -1,0 +1,29 @@
+{% if cart_books %}
+<div class="card popup-cart" style="width: 18rem;">
+  <div class="card-body">
+    <h5 class="card-title">Cart
+      <span class="badge badge-pill badge-info">{{ total['total_items'] }}</span>
+    </h5>
+    <p class="card-text">All the books you purchased are listed here.</p>
+
+    <ul class="list-group" style="max-height: 38vh; overflow: auto; margin-bottom: 20px;">
+        {% for book in cart_books %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ book.name }}
+                <span class="badge badge-pill badge-info">{{ (book.price * book.count) | format_currency('LKR') }}</span>
+                <span class="badge badge-danger badge-pill btn-remove-book" data-id="{{ book.id }}" style="cursor: pointer;">-</span>
+            </li>
+        {% else %}
+          <p class="card-text">No book selected.</p>
+        {% endfor %}
+    </ul>
+    <h5>Total Price: {{ total['total'] | format_currency('LKR') }}/=</h5>
+
+    {% if total['discount'] > 0 %}
+      <h6>Total discount: {{ total['discount'] | format_currency('LKR') }}/=</h6>
+    {% endif %}
+
+    <a href="/checkout" class="btn btn-primary" style="margin-bottom: 20px;">Checkout</a>
+  </div>
+</div>
+{% endif %}

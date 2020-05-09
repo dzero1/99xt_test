@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\XtBook;
+use App\Entity\XtCategory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -47,4 +48,16 @@ class XtBookRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function findByCategory($category_id)
+    {
+        return $this->createQueryBuilder('xt_book')
+            ->select('xt_book')
+            ->leftJoin('xt_book.category', 'cat')
+            ->andWhere('cat.id = :val')
+            ->setParameter('val', $category_id)
+            ->getQuery()
+            ->getResult();
+    }
+
 }
