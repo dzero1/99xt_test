@@ -4,6 +4,7 @@ namespace App\Service;
 
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
+use App\Entity\XtCoupon;
 use App\Repository\XtBookRepository;
 
 class CartService
@@ -112,59 +113,70 @@ class CartService
      *      3. If user has coupon code, he get 15% ONLY for total bill. others will be ignored
      */
     public function get_total($coupon = false){
+
         $hasFiveChildrenBooks = false;
         $hasTenBooksInEachCategory = false;
-
         $total_items = 0;
         $children_books_total = 0;
         $children_books_count = 0;
         $children_books_discount = 0;
         $other_books_total = 0;
-
         $real_total = 0;
         $total = 0;
         $discount = 0;
 
         $my_cart = $this->session->get('cart', []);
-
         foreach ($my_cart as $cat => $books) {
 
+            // Current category count
             $current_category_count = 0;
 
             foreach ($books as $id => $count) {
                 $book = $this->xtBookRepository->find($id);
+
+                // Current book price
                 $price = $book->getPrice() * $count;
+
+                // Final total without discount
                 $real_total += $price;
                 
+                // Total books added to cart
                 $total_items += $count;
+
+                // Count of books in current category. This will used to calculate 5% discount
                 $current_category_count += $count;
 
-                if ($cat == 1) {
-                    $children_books_total += $price;
-                    $children_books_count += $count;
+                if ($cat == $_ENV['CHILDREN_CATEGORY']) {
+                    $children_books_total += $price;        // Children books total price
+                    $children_books_count += $count;        // Children book category count
                 } else
-                    $other_books_total += $price;
+                    $other_books_total += $price;           // other category total price
             }
 
             if (!$hasFiveChildrenBooks && $cat == 1 && $children_books_count >= 5) $hasFiveChildrenBooks = true;
+
+            // Check current category count. This will used to calculate 5% discount
             if (!$hasTenBooksInEachCategory && $current_category_count >= 10) $hasTenBooksInEachCategory = true;
         }
 
-        if ($coupon){
+        if ($coupon && is_a($coupon, XtCoupon::class) ){   // If coupon object passed
             $hasFiveChildrenBooks = false;
             $hasTenBooksInEachCategory = false;
             $total = $children_books_total + $other_books_total;
             $discount = $total * ($coupon->getDiscount()/100);
             $total = $total - $discount;
         } else {
+
+            // 10% discount if more than 5 children books
             if ($hasFiveChildrenBooks) {
-                $children_books_discount = $children_books_total * 0.1;         // 10% discount
+                $children_books_discount = $children_books_total * 0.1;
                 $children_books_total = $children_books_total - $children_books_discount;
             }
             $total = $children_books_total + $other_books_total;
 
+            // 5% discount if more than 10 books from any one category
             if ($hasTenBooksInEachCategory){
-                $discount += $total * 0.05;     // 5% discount
+                $discount += $total * 0.05;
                 $total = $total - $discount;
             }
 

@@ -23,9 +23,11 @@ class DefaultController extends AbstractController
 
     public function index($category = null)
     {
+        // Get all categories
         $repository = $this->getDoctrine()->getRepository(XtCategory::class);
         $categories = $repository->findAll();
 
+        // Get books by category
         $repository = $this->getDoctrine()->getRepository(XtBook::class);
         if ($category == null || $category == "all"){
             $books = $repository->findAll();
@@ -33,8 +35,10 @@ class DefaultController extends AbstractController
             $books = $repository->findByCategory($category);
         }
 
+        // Selected books
         $cart_books = $this->cartService->get();
         
+        // Price total whith adding coupon
         $total = $this->cartService->get_total();
         
         return $this->render('index.html.twig', [

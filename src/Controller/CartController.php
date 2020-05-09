@@ -25,9 +25,11 @@ class CartController extends AbstractController
             400);
         }
 
+        // add to cart by book id
         $id = $request->request->get('id');
         $ret = $this->cartService->add($id);
         
+        // get book list and price data
         $cart_books = $this->cartService->get();
         $total = $this->cartService->get_total();
         $ret = [
@@ -35,6 +37,7 @@ class CartController extends AbstractController
             'total' => $total,
         ];
 
+        // render ajax template and pass
         $template = $this->render('popcart.html.twig', $ret)->getContent();
         $response = new JsonResponse();
         $response->setStatusCode(200);
@@ -50,9 +53,11 @@ class CartController extends AbstractController
             400);
         }
 
+        // add from cart by book id
         $id = $request->request->get('id');
         $ret = $this->cartService->remove($id);
         
+        // get book list and price data
         $cart_books = $this->cartService->get();
         $total = $this->cartService->get_total();
         $ret = [
@@ -60,6 +65,7 @@ class CartController extends AbstractController
             'total' => $total,
         ];
 
+        // render ajax template and pass
         $template = $this->render('popcart.html.twig', $ret)->getContent();
         $response = new JsonResponse();
         $response->setStatusCode(200);

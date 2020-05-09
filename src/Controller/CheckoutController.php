@@ -29,7 +29,7 @@ class CheckoutController extends AbstractController
         if (isset($request->request) && $request->isMethod('post')){
             $code = $request->request->get('code');
 
-            //var_dump($code); exit;
+            // Check for coupon and update the price
             $repository = $this->getDoctrine()->getRepository(XtCoupon::class);
             $coupon = $repository->findOneBy(['code' => $code]);
 
@@ -38,9 +38,10 @@ class CheckoutController extends AbstractController
             }
         }
 
-
+        // Selected books
         $cart_books = $this->cartService->get();
-        
+
+        // Price total whith adding coupon
         $total = $this->cartService->get_total($coupon);
         
         return $this->render('checkout.html.twig', [
