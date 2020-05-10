@@ -75,6 +75,7 @@ class DiscountTest extends WebTestCase
 
         for ($i=0; $i < $books_count; $i++) { 
             $client->xmlHttpRequest('POST', '/cart/add', ['id' => $id]);
+            $this->assertEquals(200, $client->getResponse()->getStatusCode());
         }
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
@@ -103,10 +104,9 @@ class DiscountTest extends WebTestCase
             $price += $book->getPrice();
 
             $client->xmlHttpRequest('POST', '/cart/add', ['id' => $book->getId()]);
+            $this->assertEquals(200, $client->getResponse()->getStatusCode());
         }
         $final_price = number_format( $price * 0.95 , 2 );
-
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
         $this->assertStringContainsString(
             $final_price,
@@ -120,8 +120,6 @@ class DiscountTest extends WebTestCase
         $client = static::createClient();
 
         $repository = $this->em->getRepository(XtBook::class);
-        $books = $repository->findByCategory("1");
-        $books_count = rand(1,15);
         
         $price_1 = 0;
         $discount_1 = 0;
@@ -131,42 +129,43 @@ class DiscountTest extends WebTestCase
         
         $total = 0;
 
-        for ($i=0; $i < $books_count; $i++) { 
+        /* Children books */
+        $books = $repository->findByCategory("1");
+        $books_count1 = rand(1,15);
+        for ($i=0; $i < $books_count1; $i++) { 
             $rnd = floor(rand(1, count($books)-1));
             $book = $books[$rnd];
 
             $price_1 += $book->getPrice();
 
             $client->xmlHttpRequest('POST', '/cart/add', ['id' => $book->getId()]);
+            $this->assertEquals(200, $client->getResponse()->getStatusCode());
         }
-
-        if ($books_count >= 5) {
+        if ($books_count1 >= 5) {
             $discount_1 = $price_1 * 0.1;
             $price_1 = $price_1 - $discount_1;
         }
 
+        /* Other books */
         $books = $repository->findByCategory("2");
-        $books_count = rand(1,15);
-
-        for ($i=0; $i < $books_count; $i++) { 
+        $books_count2 = rand(1,15);
+        for ($i=0; $i < $books_count2; $i++) { 
             $rnd = floor(rand(1, count($books)-1));
             $book = $books[$rnd];
 
             $price_2 += $book->getPrice();
 
             $client->xmlHttpRequest('POST', '/cart/add', ['id' => $book->getId()]);
+            $this->assertEquals(200, $client->getResponse()->getStatusCode());
         }
-
         $total = $price_1 + $price_2;
 
-        if ($books_count >= 10) {
+        if ($books_count1 >= 10 || $books_count2 >= 10) {
             $discount = $total * 0.05;
             $total = $total - $discount;
         }
 
-        $final_price = number_format( $total , 2 );
-
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $final_price = number_format($total, 2);
 
         $this->assertStringContainsString(
             $final_price,
