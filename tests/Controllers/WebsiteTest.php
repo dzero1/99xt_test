@@ -22,9 +22,10 @@ class WebsiteTest extends WebTestCase
 
         $client->request('GET', '/');
 
-        $this->assertSelectorTextContains('html .list-group .list-group-item-action[href="all"]', 'All Books');
-        $this->assertSelectorTextContains('html .list-group .list-group-item-action[href="1"]', 'Children');
-        $this->assertSelectorTextContains('html .list-group .list-group-item-action[href="2"]', 'Fiction');
+        $content = $client->getResponse()->getContent();
+        $this->assertStringContainsString("All Books", $content);
+        $this->assertStringContainsString("Children", $content);
+        $this->assertStringContainsString("Fiction", $content);
     }
 
     public function testChildrenCategory()
@@ -33,8 +34,11 @@ class WebsiteTest extends WebTestCase
 
         $client->request('GET', '/1');
 
-        $this->assertSelectorTextContains('html .books:first-child', 'Fundamentals of Wavelets');
-        $this->assertSelectorTextContains('html .books:first-child', 'LKR1,000.00');
+        $content = $client->getResponse()->getContent();
+        $this->assertStringContainsString("Fundamentals of Wavelets", $content);
+        $this->assertStringContainsString("LKR1,000.00", $content);
+
+        /* Check button content select by CSS */
         $this->assertSelectorTextContains('html .books:first-child .btn-add-to-cart', 'Add to Cart');
     }
 
@@ -44,8 +48,11 @@ class WebsiteTest extends WebTestCase
 
         $client->request('GET', '/2');
 
-        $this->assertSelectorTextContains('html .books:first-child', 'Data Smart');
-        $this->assertSelectorTextContains('html .books:first-child', 'LKR500.00/=');
+        $content = $client->getResponse()->getContent();
+        $this->assertStringContainsString("Data Smart", $content);
+        $this->assertStringContainsString("LKR500.00", $content);
+        
+        /* Check button content select by CSS */
         $this->assertSelectorTextContains('html .books:first-child .btn-add-to-cart', 'Add to Cart');
     }
     
