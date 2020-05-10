@@ -1,0 +1,11 @@
+RewriteEngine On
+#RewriteBase /bookstore/
+#RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+
+# update this line according to symlink path
+# RewriteRule . /{symlink path}/index.php [L]
+RewriteRule . /bookstore/index.php [L]
+

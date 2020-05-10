@@ -5,9 +5,9 @@
                 <div class="row">
                     <div class="col-sm-3">
                         <ul class="list-group">
-                            <a href="all" class="list-group-item list-group-item-action {% if category == null or category == 'all' %} active {% endif %}">All Books</a>
+                            <a href="{{ app.request.getBaseURL() }}/all" class="list-group-item list-group-item-action {% if category == null or category == 'all' %} active {% endif %}">All Books</a>
                             {% for cat in categories %}
-                                <a href="{{ cat.id }}" class="list-group-item list-group-item-action {% if category == cat.id %} active {% endif %} ">{{ cat.name }}</a>
+                                <a href="{{ app.request.getBaseURL() }}/{{ cat.id }}" class="list-group-item list-group-item-action {% if category == cat.id %} active {% endif %} ">{{ cat.name }}</a>
                             {% else %}
                                 No categories have been found.
                             {% endfor %}
